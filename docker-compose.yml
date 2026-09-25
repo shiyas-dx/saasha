@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: saasha_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=saasha_super_secret_b2b_wholesale_key_2026_998877
+      - DATABASE_URL=sqlite:///./saasha.db
+    volumes:
+      - ./backend/saasha.db:/app/saasha.db
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: saasha_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+    restart: always
