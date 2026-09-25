@@ -9,28 +9,32 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: '#f0f4ff',
-          100: '#e0e9ff',
-          200: '#c7d7fe',
-          300: '#a4bcfd',
-          400: '#7a96fc',
-          500: '#4f6bf6',
-          600: '#384ceb',
-          700: '#2d3ad7',
-          800: '#2a31ae',
-          900: '#272e8a',
-          950: '#191b54',
+          50: '#ecfeff',
+          100: '#cffaff',
+          200: '#a5f3fc',
+          300: '#67e8f9',
+          400: '#22d3ee',
+          500: '#06b6d4',
+          600: '#0891b2',
+          700: '#0e7490',
+          800: '#155e75',
+          900: '#164e63',
+          950: '#083344',
         },
-        wholesale: {
-          amber: '#f59e0b',
+        cyber: {
+          dark: '#090d16',
+          panel: '#0f172a',
+          card: '#1e293b',
+          cyan: '#06b6d4',
+          indigo: '#6366f1',
+          purple: '#a855f7',
           emerald: '#10b981',
-          dark: '#0f172a',
-          slate: '#1e293b',
-          light: '#f8fafc',
+          amber: '#f59e0b',
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
       }
     },
   },
