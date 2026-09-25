@@ -22,7 +22,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         shop_name=user_in.shop_name,
         phone=user_in.phone,
         address=user_in.address,
-        role=user_in.role if user_in.role in ["ADMIN", "SHOPKEEPER"] else "SHOPKEEPER"
+        role=user_in.role if user_in.role in ["SUPERADMIN", "ADMIN", "SHOPKEEPER"] else "SHOPKEEPER"
     )
     db.add(user)
     db.commit()

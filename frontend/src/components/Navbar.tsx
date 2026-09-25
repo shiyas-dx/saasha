@@ -81,7 +81,7 @@ export const Navbar = () => {
               className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition-all"
             >
               <ShieldCheck className="w-4 h-4 text-amber-400" />
-              Admin Portal
+              {user?.role === 'SUPERADMIN' ? 'Superadmin Desk' : 'Admin Portal'}
             </Link>
           )}
 

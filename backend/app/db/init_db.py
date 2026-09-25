@@ -8,9 +8,25 @@ def init_db():
     db = SessionLocal()
 
     try:
+        # Check if superadmin exists
+        superadmin_user = db.query(User).filter(User.email == "superadmin@saasha.com").first()
+        if not superadmin_user:
+            print("Seeding Superadmin account...")
+            super_admin = User(
+                email="superadmin@saasha.com",
+                hashed_password=get_password_hash("superadmin123"),
+                full_name="Owner Super Admin",
+                shop_name="SAASHA Global HQ",
+                phone="+91 9999999999",
+                address="SAASHA Headquarters, Executive Suite 1",
+                role="SUPERADMIN"
+            )
+            db.add(super_admin)
+            db.commit()
+
         # Check if users exist
-        if db.query(User).count() == 0:
-            print("Seeding initial users...")
+        if db.query(User).count() <= 1:
+            print("Seeding initial admins and shopkeeper...")
             admin1 = User(
                 email="admin@saasha.com",
                 hashed_password=get_password_hash("admin123"),
@@ -243,7 +259,7 @@ def init_db():
             db.add_all(products)
             db.commit()
 
-        print("Database initialized successfully.")
+        print("Database initialized successfully with Superadmin, Admins, and Shopkeepers.")
     finally:
         db.close()
 

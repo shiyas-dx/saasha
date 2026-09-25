@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Store, Key, Mail, UserCheck, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Store, Key, Mail, Crown, ShieldCheck, AlertCircle } from 'lucide-react';
 
 function LoginContent() {
   const router = useRouter();
@@ -31,7 +31,7 @@ function LoginContent() {
     try {
       if (mode === 'login') {
         const loggedUser = await login(email, password);
-        if (loggedUser.role === 'ADMIN') {
+        if (loggedUser.role === 'SUPERADMIN' || loggedUser.role === 'ADMIN') {
           router.push('/admin');
         } else {
           router.push(redirectPath);
@@ -78,6 +78,13 @@ function LoginContent() {
             1-Click Demo Accounts:
           </span>
           <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => fillDemo('superadmin@saasha.com', 'superadmin123')}
+              className="col-span-2 px-2.5 py-1.5 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 text-[11px] font-bold text-left flex items-center gap-1.5"
+            >
+              <Crown className="w-3.5 h-3.5 text-purple-400" /> Superadmin Owner (`superadmin@saasha.com`)
+            </button>
+
             <button
               onClick={() => fillDemo('admin@saasha.com', 'admin123')}
               className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 text-[11px] font-bold text-left flex items-center gap-1"

@@ -9,7 +9,7 @@ from app.models.order import Order
 from app.schemas.product import ProductCreate, ProductUpdate, ProductOut, CategoryCreate, CategoryOut
 from app.schemas.order import OrderOut, OrderStatusUpdate
 from app.schemas.user import UserOut
-from app.core.security import require_admin
+from app.core.security import require_admin, require_superadmin
 
 router = APIRouter(prefix="/admin", tags=["Admin Operations"], dependencies=[Depends(require_admin)])
 
@@ -22,6 +22,7 @@ def get_admin_stats(db: Session = Depends(get_db)):
     low_stock_products = db.query(Product).filter(Product.stock_quantity < 20).count()
     total_shopkeepers = db.query(User).filter(User.role == "SHOPKEEPER").count()
     total_admins = db.query(User).filter(User.role == "ADMIN").count()
+    total_superadmins = db.query(User).filter(User.role == "SUPERADMIN").count()
 
     return {
         "total_orders": total_orders,
@@ -30,7 +31,8 @@ def get_admin_stats(db: Session = Depends(get_db)):
         "total_products": total_products,
         "low_stock_products": low_stock_products,
         "total_shopkeepers": total_shopkeepers,
-        "total_admins": total_admins
+        "total_admins": total_admins,
+        "total_superadmins": total_superadmins
     }
 
 # Products Management
@@ -109,18 +111,30 @@ def update_order_status(order_id: int, status_in: OrderStatusUpdate, db: Session
     db.refresh(order)
     return order
 
-# Users / Multi-Admin Management
+# Users / Role Management (SUPERADMIN, ADMIN, SHOPKEEPER)
 @router.get("/users", response_model=List[UserOut])
 def get_all_users(db: Session = Depends(get_db)):
     return db.query(User).order_by(User.id.desc()).all()
 
 @router.patch("/users/{user_id}/role")
-def change_user_role(user_id: int, role: str, db: Session = Depends(get_db)):
-    if role not in ["ADMIN", "SHOPKEEPER"]:
-        raise HTTPException(status_code=400, detail="Role must be 'ADMIN' or 'SHOPKEEPER'")
+def change_user_role(
+    user_id: int, 
+    role: str, 
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    role_upper = role.upper()
+    if role_upper not in ["SUPERADMIN", "ADMIN", "SHOPKEEPER"]:
+        raise HTTPException(status_code=400, detail="Role must be 'SUPERADMIN', 'ADMIN' or 'SHOPKEEPER'")
+
+    # Only SUPERADMIN can promote someone to SUPERADMIN or demote a SUPERADMIN
+    if (role_upper == "SUPERADMIN" or current_user.role != "SUPERADMIN") and current_user.role != "SUPERADMIN":
+        raise HTTPException(status_code=403, detail="Only the Superadmin can assign or change Superadmin privileges.")
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    user.role = role
+
+    user.role = role_upper
     db.commit()
-    return {"message": f"User role updated to {role}", "user_id": user_id, "role": role}
+    return {"message": f"User role updated to {role_upper}", "user_id": user_id, "role": role_upper}

@@ -10,7 +10,7 @@ export interface User {
   shop_name?: string;
   phone?: string;
   address?: string;
-  role: 'ADMIN' | 'SHOPKEEPER';
+  role: 'SUPERADMIN' | 'ADMIN' | 'SHOPKEEPER';
   is_active: boolean;
   created_at: string;
 }
@@ -21,6 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User>;
   register: (data: any) => Promise<User>;
   logout: () => void;
+  isSuperAdmin: boolean;
   isAdmin: boolean;
   isShopkeeper: boolean;
 }
@@ -79,11 +80,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  const isAdmin = user?.role === 'ADMIN';
+  const isSuperAdmin = user?.role === 'SUPERADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const isShopkeeper = user?.role === 'SHOPKEEPER';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAdmin, isShopkeeper }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, isSuperAdmin, isAdmin, isShopkeeper }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -6,24 +6,20 @@ import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import {
   ShieldCheck,
+  Crown,
   Package,
   TrendingUp,
   Users,
   AlertTriangle,
   Plus,
   Trash2,
-  Edit,
   CheckCircle2,
-  Clock,
-  Layers,
-  Store,
-  UserPlus,
   X
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, isSuperAdmin, loading: authLoading } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'stats' | 'orders' | 'products' | 'users'>('orders');
   const [stats, setStats] = useState<any>(null);
@@ -119,32 +115,32 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleToggleAdminRole = async (targetUserId: number, currentRole: string) => {
-    const newRole = currentRole === 'ADMIN' ? 'SHOPKEEPER' : 'ADMIN';
+  const handleChangeRole = async (targetUserId: number, newRole: string) => {
     if (!confirm(`Change user role to ${newRole}?`)) return;
     try {
       await fetchApi(`/admin/users/${targetUserId}/role?role=${newRole}`, { method: 'PATCH' });
       loadAdminData();
-    } catch (err) {
-      alert('Failed to update role');
+    } catch (err: any) {
+      alert(err.message || 'Failed to update role. Only Superadmin can assign Superadmin privileges.');
     }
   };
 
   if (loading || authLoading) {
-    return <div className="text-center py-20 text-slate-400 font-bold">Loading Admin Portal...</div>;
+    return <div className="text-center py-20 text-slate-400 font-bold">Loading Management Portal...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Header & Multi-Admin Status Banner */}
-      <div className="glass-panel p-6 rounded-3xl border border-amber-500/30 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Header & Role Status Banner */}
+      <div className={`glass-panel p-6 rounded-3xl border ${isSuperAdmin ? 'border-purple-500/40 bg-gradient-to-r from-slate-900 via-purple-950/30 to-slate-900' : 'border-amber-500/30 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
         <div>
-          <div className="inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-300 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-amber-500/30 mb-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" /> Multi-Admin Control Desk
+          <div className={`inline-flex items-center gap-1.5 ${isSuperAdmin ? 'bg-purple-500/20 text-purple-300 border-purple-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'} text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border mb-1`}>
+            {isSuperAdmin ? <Crown className="w-3.5 h-3.5 text-purple-400" /> : <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />}
+            {isSuperAdmin ? 'Superadmin Owner Desk' : 'Warehouse Management Desk'}
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-white">SAASHA Warehouse Management</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-white">SAASHA Management Console</h1>
           <p className="text-xs text-slate-300 mt-0.5">
-            Logged in as Admin: <strong className="text-amber-400">{user?.full_name}</strong> ({user?.email})
+            Logged in as: <strong className={isSuperAdmin ? 'text-purple-400' : 'text-amber-400'}>{user?.full_name}</strong> ({user?.role})
           </p>
         </div>
 
@@ -168,7 +164,7 @@ export default function AdminDashboardPage() {
           <div className="glass-card p-4 rounded-2xl border border-slate-800">
             <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Pending Orders</span>
             <div className="text-lg sm:text-2xl font-black text-amber-400 mt-1">{stats.pending_orders}</div>
-            <span className="text-[10px] text-amber-300 font-semibold">Requires warehouse approval</span>
+            <span className="text-[10px] text-amber-300 font-semibold">Requires approval</span>
           </div>
 
           <div className="glass-card p-4 rounded-2xl border border-slate-800">
@@ -178,8 +174,10 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="glass-card p-4 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active Admins</span>
-            <div className="text-lg sm:text-2xl font-black text-indigo-400 mt-1">{stats.total_admins} Admins</div>
+            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">System Accounts</span>
+            <div className="text-lg sm:text-2xl font-black text-purple-400 mt-1">
+              {stats.total_superadmins} Superadmin • {stats.total_admins} Admins
+            </div>
             <span className="text-[10px] text-slate-400">{stats.total_shopkeepers} Shopkeepers onboarded</span>
           </div>
         </div>
@@ -209,7 +207,7 @@ export default function AdminDashboardPage() {
             activeTab === 'users' ? 'bg-amber-500 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
-          Multi-Admin & User Roles ({usersList.length})
+          3-Role Hierarchy & Users ({usersList.length})
         </button>
       </div>
 
@@ -254,7 +252,6 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
 
-                  {/* Order Items Table */}
                   <div className="grid sm:grid-cols-2 gap-2 text-xs">
                     {order.items?.map((item: any) => (
                       <div key={item.id} className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 flex justify-between">
@@ -316,33 +313,46 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 3: MULTI-ADMIN & USERS ROLES */}
+      {/* TAB 3: 3-ROLE HIERARCHY & USERS */}
       {activeTab === 'users' && (
         <div className="space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Accounts & Admin Access</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Role Hierarchy (Superadmin → Admin → Shopkeeper)</h2>
+              <p className="text-xs text-slate-400">Manage user authorization roles and admin privileges.</p>
+            </div>
+          </div>
+
           <div className="space-y-2">
             {usersList.map((usr) => (
-              <div key={usr.id} className="glass-card p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4">
+              <div key={usr.id} className="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-white">{usr.full_name}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${usr.role === 'ADMIN' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-300'}`}>
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black ${
+                      usr.role === 'SUPERADMIN'
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                        : usr.role === 'ADMIN'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        : 'bg-slate-800 text-slate-300'
+                    }`}>
                       {usr.role}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-0.5">{usr.email} • {usr.shop_name || 'No shop name'}</p>
                 </div>
 
-                <button
-                  onClick={() => handleToggleAdminRole(usr.id, usr.role)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    usr.role === 'ADMIN'
-                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
-                  }`}
-                >
-                  {usr.role === 'ADMIN' ? 'Demote to Shopkeeper' : 'Make Admin'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={usr.role}
+                    onChange={(e) => handleChangeRole(usr.id, e.target.value)}
+                    className="bg-slate-900 border border-slate-700 text-slate-200 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none"
+                  >
+                    <option value="SHOPKEEPER">SHOPKEEPER (Buyer)</option>
+                    <option value="ADMIN">ADMIN (Manager)</option>
+                    <option value="SUPERADMIN">SUPERADMIN (Owner)</option>
+                  </select>
+                </div>
               </div>
             ))}
           </div>
