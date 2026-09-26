@@ -21,7 +21,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, isAdmin, isSuperAdmin, loading: authLoading } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'stats' | 'orders' | 'products' | 'users'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'users'>('orders');
   const [stats, setStats] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -36,13 +36,13 @@ export default function AdminDashboardPage() {
     sku: '',
     category_id: 1,
     description: '',
-    image_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',
-    unit: 'Box (12 pcs)',
-    wholesale_price: 500,
-    retail_mrp: 900,
-    moq: 2,
-    stock_quantity: 100,
-    badge_text: 'High Margin',
+    image_url: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80',
+    unit: 'Box (5 pcs)',
+    wholesale_price: 2500,
+    retail_mrp: 5000,
+    moq: 1,
+    stock_quantity: 50,
+    badge_text: 'Service Pack',
     is_featured: false,
     is_new: true,
   });
@@ -115,38 +115,27 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleChangeRole = async (targetUserId: number, newRole: string) => {
-    if (!confirm(`Change user role to ${newRole}?`)) return;
-    try {
-      await fetchApi(`/admin/users/${targetUserId}/role?role=${newRole}`, { method: 'PATCH' });
-      loadAdminData();
-    } catch (err: any) {
-      alert(err.message || 'Failed to update role. Only Superadmin can assign Superadmin privileges.');
-    }
-  };
-
   if (loading || authLoading) {
-    return <div className="text-center py-20 text-slate-400 font-bold">Loading Management Portal...</div>;
+    return <div className="text-center py-20 text-slate-400 font-bold">Loading Management Console...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Header & Role Status Banner */}
-      <div className={`glass-panel p-6 rounded-3xl border ${isSuperAdmin ? 'border-purple-500/40 bg-gradient-to-r from-slate-900 via-purple-950/30 to-slate-900' : 'border-amber-500/30 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
+      {/* Header Banner */}
+      <div className="glass-panel p-6 rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className={`inline-flex items-center gap-1.5 ${isSuperAdmin ? 'bg-purple-500/20 text-purple-300 border-purple-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'} text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border mb-1`}>
-            {isSuperAdmin ? <Crown className="w-3.5 h-3.5 text-purple-400" /> : <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />}
-            {isSuperAdmin ? 'Superadmin Owner Desk' : 'Warehouse Management Desk'}
+          <div className="inline-flex items-center gap-1.5 bg-cyan-500/20 text-cyan-300 border-cyan-500/40 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border mb-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" /> Warehouse Management Desk
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-white">SAASHA Management Console</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-white">SAASHA Spares Control Center</h1>
           <p className="text-xs text-slate-300 mt-0.5">
-            Logged in as: <strong className={isSuperAdmin ? 'text-purple-400' : 'text-amber-400'}>{user?.full_name}</strong> ({user?.role})
+            Logged in as Admin: <strong className="text-cyan-400">{user?.full_name}</strong> ({user?.email})
           </p>
         </div>
 
         <button
           onClick={() => setShowAddProductModal(true)}
-          className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-all shadow-lg shadow-amber-500/20 flex items-center gap-1.5"
+          className="px-4 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs transition-all shadow-lg shadow-cyan-400/20 flex items-center gap-1.5"
         >
           <Plus className="w-4 h-4" /> Add Wholesale Item
         </button>
@@ -169,16 +158,14 @@ export default function AdminDashboardPage() {
 
           <div className="glass-card p-4 rounded-2xl border border-slate-800">
             <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Catalog Inventory</span>
-            <div className="text-lg sm:text-2xl font-black text-brand-400 mt-1">{stats.total_products} Items</div>
+            <div className="text-lg sm:text-2xl font-black text-cyan-400 mt-1">{stats.total_products} Items</div>
             <span className="text-[10px] text-slate-400">{stats.low_stock_products} low stock warnings</span>
           </div>
 
           <div className="glass-card p-4 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">System Accounts</span>
-            <div className="text-lg sm:text-2xl font-black text-purple-400 mt-1">
-              {stats.total_superadmins} Superadmin • {stats.total_admins} Admins
-            </div>
-            <span className="text-[10px] text-slate-400">{stats.total_shopkeepers} Shopkeepers onboarded</span>
+            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Onboarded Shopkeepers</span>
+            <div className="text-lg sm:text-2xl font-black text-purple-400 mt-1">{stats.total_shopkeepers} Labs</div>
+            <span className="text-[10px] text-slate-400">{stats.total_admins} Warehouse Admins</span>
           </div>
         </div>
       )}
@@ -188,26 +175,26 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('orders')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'orders' ? 'bg-amber-500 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
+            activeTab === 'orders' ? 'bg-cyan-400 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
-          Shopkeeper Orders ({orders.length})
+          Spares Orders Queue ({orders.length})
         </button>
         <button
           onClick={() => setActiveTab('products')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'products' ? 'bg-amber-500 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
+            activeTab === 'products' ? 'bg-cyan-400 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
-          Products & Inventory ({products.length})
+          Inventory & Stock ({products.length})
         </button>
         <button
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'users' ? 'bg-amber-500 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
+            activeTab === 'users' ? 'bg-cyan-400 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
-          3-Role Hierarchy & Users ({usersList.length})
+          Technicians & Lab Accounts ({usersList.length})
         </button>
       </div>
 
@@ -223,16 +210,16 @@ export default function AdminDashboardPage() {
                 <div key={order.id} className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
                     <div>
-                      <span className="font-mono text-sm font-black text-amber-400">{order.order_number}</span>
+                      <span className="font-mono text-sm font-black text-cyan-400">{order.order_number}</span>
                       <p className="text-xs font-bold text-white mt-0.5">
-                        Shop: {order.user?.shop_name || 'Retailer'} ({order.user?.full_name})
+                        Shop: {order.user?.shop_name || 'Technician Lab'} ({order.user?.full_name})
                       </p>
                       <p className="text-[11px] text-slate-400">Address: {order.shipping_address}</p>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <span className="text-xs font-black text-brand-400">₹{order.total_amount.toLocaleString('en-IN')}</span>
+                        <span className="text-xs font-black text-cyan-400">₹{order.total_amount.toLocaleString('en-IN')}</span>
                         <span className="text-[10px] text-slate-400 block">{order.total_items} total items</span>
                       </div>
 
@@ -240,7 +227,7 @@ export default function AdminDashboardPage() {
                       <select
                         value={order.status}
                         onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                        className="bg-slate-900 border border-amber-500/50 text-amber-300 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none"
+                        className="bg-slate-900 border border-cyan-500/50 text-cyan-300 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none"
                       >
                         <option value="PENDING">PENDING</option>
                         <option value="APPROVED">APPROVED</option>
@@ -277,7 +264,7 @@ export default function AdminDashboardPage() {
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">Catalog Inventory</h2>
             <button
               onClick={() => setShowAddProductModal(true)}
-              className="px-3 py-1.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs"
+              className="px-3 py-1.5 bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs"
             >
               + Add Item
             </button>
@@ -287,11 +274,11 @@ export default function AdminDashboardPage() {
             {products.map((prod) => (
               <div key={prod.id} className="glass-card p-4 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
                 <div className="flex items-center gap-3">
-                  <img src={prod.image_url} alt={prod.name} className="w-14 h-14 rounded-xl object-cover bg-slate-900" />
+                  <img src={prod.image_url} alt={prod.name} className="w-14 h-14 rounded-xl object-cover bg-slate-900 border border-slate-800" />
                   <div>
                     <h4 className="text-xs font-bold text-white line-clamp-1">{prod.name}</h4>
                     <p className="text-[10px] font-mono text-slate-400">SKU: {prod.sku}</p>
-                    <p className="text-[10px] font-bold text-amber-400 mt-0.5">₹{prod.wholesale_price} / {prod.unit}</p>
+                    <p className="text-[10px] font-bold text-cyan-400 mt-0.5">₹{prod.wholesale_price} / {prod.unit}</p>
                   </div>
                 </div>
 
@@ -313,45 +300,21 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 3: 3-ROLE HIERARCHY & USERS */}
+      {/* TAB 3: REGISTERED USERS */}
       {activeTab === 'users' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-            <div>
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Role Hierarchy (Superadmin → Admin → Shopkeeper)</h2>
-              <p className="text-xs text-slate-400">Manage user authorization roles and admin privileges.</p>
-            </div>
-          </div>
-
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Registered Repair Labs & Technicians</h2>
           <div className="space-y-2">
             {usersList.map((usr) => (
-              <div key={usr.id} className="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div key={usr.id} className="glass-card p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-white">{usr.full_name}</span>
-                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black ${
-                      usr.role === 'SUPERADMIN'
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                        : usr.role === 'ADMIN'
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                        : 'bg-slate-800 text-slate-300'
-                    }`}>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                       {usr.role}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-0.5">{usr.email} • {usr.shop_name || 'No shop name'}</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <select
-                    value={usr.role}
-                    onChange={(e) => handleChangeRole(usr.id, e.target.value)}
-                    className="bg-slate-900 border border-slate-700 text-slate-200 text-xs font-semibold rounded-xl px-3 py-1.5 focus:outline-none"
-                  >
-                    <option value="SHOPKEEPER">SHOPKEEPER (Buyer)</option>
-                    <option value="ADMIN">ADMIN (Manager)</option>
-                    <option value="SUPERADMIN">SUPERADMIN (Owner)</option>
-                  </select>
                 </div>
               </div>
             ))}
@@ -364,7 +327,7 @@ export default function AdminDashboardPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="glass-panel max-w-lg w-full p-6 rounded-3xl border border-slate-700 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white">Add New Wholesale Item</h3>
+              <h3 className="text-base font-bold text-white">Add New Wholesale Component</h3>
               <button onClick={() => setShowAddProductModal(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
@@ -378,7 +341,7 @@ export default function AdminDashboardPage() {
                   type="text"
                   value={productForm.name}
                   onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                  placeholder="e.g. Premium Instant Coffee Jar 200g (Pack of 12)"
+                  placeholder="e.g. OLED Screen Assembly for iPhone 15 Pro Max"
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white"
                 />
               </div>
@@ -391,7 +354,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={productForm.sku}
                     onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })}
-                    placeholder="FOOD-COF-001"
+                    placeholder="DSP-IP15PM-SP"
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-mono"
                   />
                 </div>
@@ -421,7 +384,7 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Retail MRP (₹)</label>
+                  <label className="block text-slate-300 font-bold mb-1">Repair MRP (₹)</label>
                   <input
                     required
                     type="number"
@@ -439,7 +402,7 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={productForm.unit}
                     onChange={(e) => setProductForm({ ...productForm, unit: e.target.value })}
-                    placeholder="Box (12 pcs)"
+                    placeholder="Box (5 pcs)"
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white"
                   />
                 </div>
@@ -475,9 +438,9 @@ export default function AdminDashboardPage() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs mt-2"
+                className="w-full py-3 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black rounded-xl text-xs mt-2"
               >
-                Save Wholesale Product
+                Save Wholesale Item
               </button>
             </form>
           </div>

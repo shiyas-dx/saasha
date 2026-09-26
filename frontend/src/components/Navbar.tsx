@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Search, User, ShieldCheck, Cpu, Smartphone, Wrench, Crown, LogOut, Store } from 'lucide-react';
+import { ShoppingBag, Search, User, ShieldCheck, Cpu, Smartphone, Wrench, Crown, LogOut, Store, Layers } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 
@@ -24,16 +24,25 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-40 glass-header">
       {/* Top Banner Notice for Wholesale Tech Parts */}
-      <div className="bg-gradient-to-r from-slate-950 via-cyan-950/60 to-slate-950 py-1.5 px-4 text-center text-xs text-cyan-200 flex items-center justify-center gap-2 font-medium border-b border-cyan-500/10">
-        <span className="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded text-[10px] uppercase font-bold border border-cyan-500/30 flex items-center gap-1">
-          <Cpu className="w-3 h-3 text-cyan-400" /> B2B Mobile Spares & Lab Equipment
-        </span>
-        <span className="hidden sm:inline">Direct Factory Rates for Repair Shops, Technicians & Service Centers</span>
+      <div className="bg-gradient-to-r from-slate-950 via-cyan-950/60 to-slate-950 py-1.5 px-4 text-center text-xs text-cyan-200 flex items-center justify-between font-medium border-b border-cyan-500/10 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <span className="bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded text-[10px] uppercase font-bold border border-cyan-500/30 flex items-center gap-1">
+            <Cpu className="w-3 h-3 text-cyan-400" /> B2B Mobile Parts Wholesale
+          </span>
+          <span className="hidden md:inline text-slate-300 text-[11px]">Direct Warehouse Rates for Repair Labs & Technicians</span>
+        </div>
+
+        <div className="flex items-center gap-3 text-[11px] font-mono">
+          <span className="text-emerald-400 flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" /> Stock Updated Today
+          </span>
+          <span className="hidden sm:inline text-slate-400">| Dispatch in 24 Hours</span>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/" className="flex items-center gap-2.5 group shrink-0">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
             <Cpu className="w-6 h-6 text-white" />
           </div>
@@ -43,20 +52,20 @@ export const Navbar = () => {
                 SAASHA
               </span>
               <span className="bg-cyan-500/10 text-cyan-400 text-[9px] font-bold px-1.5 py-0.5 rounded border border-cyan-500/20">
-                SPARES
+                PRO
               </span>
             </div>
             <span className="text-[9px] text-slate-400 -mt-0.5 font-semibold tracking-widest uppercase">
-              Mobile Parts & Tools Wholesale
+              Mobile Parts & Tools
             </span>
           </div>
         </Link>
 
-        {/* Search Bar with live model suggestion prompt */}
+        {/* Live Search Bar */}
         <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md relative">
           <input
             type="text"
-            placeholder="Search parts by phone model (e.g. iPhone 14, S23 Ultra, PMIC IC)..."
+            placeholder="Search by phone model (e.g. iPhone 14 Pro, S23 Ultra, PMIC IC)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-slate-900/90 border border-slate-700/80 rounded-full py-2 pl-4 pr-10 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
@@ -64,7 +73,7 @@ export const Navbar = () => {
           <button
             type="submit"
             aria-label="Submit search"
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-cyan-600 rounded-full flex items-center justify-center text-white hover:bg-cyan-500 transition-colors"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-cyan-500 rounded-full flex items-center justify-center text-slate-950 hover:bg-cyan-400 transition-colors"
           >
             <Search className="w-4 h-4" />
           </button>
@@ -74,10 +83,10 @@ export const Navbar = () => {
         <div className="flex items-center gap-3">
           <Link
             href="/products"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 rounded-xl hover:bg-slate-900 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-300 hover:text-white px-3.5 py-2 rounded-xl hover:bg-slate-900 transition-colors border border-transparent hover:border-slate-800"
           >
             <Store className="w-4 h-4 text-cyan-400" />
-            Spares Catalog
+            Parts Catalog
           </Link>
 
           {isAdmin && (
@@ -90,25 +99,26 @@ export const Navbar = () => {
               }`}
             >
               {isSuperAdmin ? <Crown className="w-4 h-4 text-purple-400" /> : <ShieldCheck className="w-4 h-4 text-amber-400" />}
-              {isSuperAdmin ? 'Superadmin Desk' : 'Admin Desk'}
+              Management
             </Link>
           )}
 
-          {/* Cart Icon */}
+          {/* Cart Trigger */}
           <Link
             href="/cart"
-            className="relative p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-cyan-500/40 transition-colors"
+            className="relative p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-cyan-500/40 transition-colors flex items-center gap-2"
             title="Bulk Spares Cart"
           >
             <ShoppingBag className="w-5 h-5 text-cyan-400" />
+            <span className="hidden sm:inline text-xs font-bold text-slate-200">Cart</span>
             {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-cyan-500 text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+              <span className="bg-cyan-400 text-slate-950 text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-md animate-pulse">
                 {totalItems > 99 ? '99+' : totalItems}
               </span>
             )}
           </Link>
 
-          {/* User Profile / Auth */}
+          {/* User Account / Auth */}
           {user ? (
             <div className="relative">
               <button
@@ -118,14 +128,14 @@ export const Navbar = () => {
                 <div className="w-7 h-7 rounded-lg bg-cyan-600 flex items-center justify-center text-xs font-bold text-white">
                   {user.full_name?.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden lg:inline text-xs font-medium text-slate-200 max-w-[100px] truncate">
+                <span className="hidden lg:inline text-xs font-semibold text-slate-200 max-w-[100px] truncate">
                   {user.shop_name || user.full_name}
                 </span>
               </button>
 
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-60 glass-panel rounded-2xl p-2 shadow-2xl z-50 border border-cyan-500/30 animate-in fade-in slide-in-from-top-2">
-                  <div className="p-2 border-b border-slate-800">
+                  <div className="p-2.5 border-b border-slate-800">
                     <p className="text-xs font-bold text-white truncate">{user.full_name}</p>
                     <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
                     {user.shop_name && (
@@ -168,10 +178,10 @@ export const Navbar = () => {
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-black bg-cyan-400 hover:bg-cyan-300 px-4 py-2 rounded-xl transition-all shadow-md shadow-cyan-400/20"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 px-4 py-2 rounded-xl transition-all shadow-md shadow-cyan-400/20"
             >
               <User className="w-4 h-4" />
-              Technician Login
+              Sign In
             </Link>
           )}
         </div>

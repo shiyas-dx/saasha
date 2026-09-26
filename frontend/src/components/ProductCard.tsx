@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Check, Plus, Minus, Cpu, ShieldCheck, Zap, Tag, Wrench } from 'lucide-react';
+import { ShoppingCart, Check, Plus, Minus, Cpu, ShieldCheck, Zap, Tag, Wrench, Layers } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
@@ -40,22 +40,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group glass-card rounded-2xl p-3.5 flex flex-col justify-between transition-all duration-300 relative border border-slate-800/80 hover:border-cyan-500/40">
       <div>
-        {/* Top Badges Overlay (Pinterest / Dribbble tech tag style) */}
+        {/* Top Grade Tag Overlay */}
         <div className="flex items-center justify-between gap-1 mb-2">
           <div className="flex items-center gap-1 flex-wrap">
-            {product.badge_text && (
-              <span className="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-cyan-500/30 flex items-center gap-1">
-                <ShieldCheck className="w-2.5 h-2.5 text-cyan-400" />
+            {product.badge_text ? (
+              <span className="bg-cyan-500/10 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-cyan-500/30 flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-cyan-400" />
                 {product.badge_text}
+              </span>
+            ) : (
+              <span className="bg-slate-800 text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-700">
+                OEM Grade A+
               </span>
             )}
           </div>
-          <span className="text-[10px] font-mono text-cyan-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-md">
+          <span className="text-[10px] font-mono text-cyan-400 bg-slate-950 border border-slate-800 px-2 py-0.5 rounded-md">
             MOQ: {product.moq}
           </span>
         </div>
 
-        {/* Component Macro Image */}
+        {/* Component Macro Image Container */}
         <Link href={`/products/${product.id}`} className="block relative aspect-square w-full bg-slate-900 rounded-xl overflow-hidden mb-3 border border-slate-800 group-hover:border-cyan-500/30 transition-colors">
           <img
             src={product.image_url || 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80'}
@@ -64,13 +68,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             loading="lazy"
           />
           {product.stock_quantity <= 0 && (
-            <div className="absolute inset-0 bg-slate-950/85 flex items-center justify-center text-red-400 font-bold text-xs uppercase tracking-wider">
+            <div className="absolute inset-0 bg-slate-950/90 flex items-center justify-center text-red-400 font-bold text-xs uppercase tracking-wider">
               Out of Stock
             </div>
           )}
         </Link>
 
-        {/* Title & SKU Code */}
+        {/* Component Name & SKU */}
         <Link href={`/products/${product.id}`}>
           <h3 className="text-xs sm:text-sm font-bold text-slate-100 line-clamp-2 hover:text-cyan-400 transition-colors leading-snug">
             {product.name}
@@ -81,7 +85,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </Link>
       </div>
 
-      {/* Pricing & Cart Actions */}
+      {/* Price & Bulk Action */}
       <div className="mt-3 pt-3 border-t border-slate-800/80">
         <div className="flex items-baseline justify-between mb-2">
           <div>
@@ -92,14 +96,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 block">Repair Fee</span>
+            <span className="text-[10px] text-slate-400 block">Repair MRP</span>
             <span className="text-xs font-semibold text-slate-400 line-through">
               ₹{product.retail_mrp.toLocaleString('en-IN')}
             </span>
           </div>
         </div>
 
-        {/* Quantity Controls & Add Button */}
+        {/* Quantity Controls & Add to Cart */}
         <div className="flex items-center gap-2 mt-2">
           <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl px-1 py-1">
             <button
@@ -129,7 +133,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md ${
               addedAnimation
                 ? 'bg-emerald-600 text-white'
-                : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-cyan-500/20'
+                : 'bg-cyan-400 hover:bg-cyan-300 text-slate-950 shadow-cyan-400/20'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {addedAnimation ? (

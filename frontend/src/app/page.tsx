@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Layers,
   Sparkles,
-  Award
+  Award,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -46,31 +47,30 @@ export default function HomePage() {
 
   return (
     <div className="space-y-12">
-      {/* PINTEREST / DRIBBBLE STYLE BENTO GRID HERO */}
+      {/* HIGH-IMPACT B2B HERO SHOWCASE */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950/40 border border-cyan-500/20 p-6 sm:p-10 shadow-2xl">
         <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="grid lg:grid-cols-12 gap-8 items-center relative z-10">
-          {/* Main Hero Copy */}
           <div className="lg:col-span-7 space-y-5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold">
               <Cpu className="w-4 h-4 text-cyan-400" />
-              <span>Direct Wholesaler of Mobile Phone Spare Parts & Lab Tools</span>
+              <span>Direct Wholesaler of Mobile Phone Spare Parts & Tools</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-              Stock Your Repair Lab with <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">OEM Spare Parts</span>
+              Stock Your Repair Lab with <span className="text-gradient-cyan">OEM Spare Parts</span>
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 max-w-xl font-normal leading-relaxed">
-              SAASHA supplies original OLED displays, pure cobalt batteries, charging flexes, BGA PMIC ICs, and professional hot air rework stations directly to repair shop technicians.
+              SAASHA supplies original OLED displays, pure cobalt batteries, charging flexes, BGA PMIC ICs, and 1000W rework stations directly to repair shop technicians.
             </p>
 
-            {/* Quick Brand Compatibility Badges */}
+            {/* Quick Brand Filter Badges */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               <span className="text-slate-400 text-[11px] font-bold">Compatibility:</span>
-              {['iPhone 15/14', 'Samsung S24/S23', 'Xiaomi / Redmi', 'OnePlus', 'Realme / Vivo / OPPO'].map((brand) => (
+              {['iPhone 15/14', 'Samsung S24/S23', 'Xiaomi / Redmi', 'OnePlus', 'Micro ICs'].map((brand) => (
                 <Link
                   key={brand}
                   href={`/products?query=${encodeURIComponent(brand)}`}
@@ -93,12 +93,12 @@ export default function HomePage() {
                 href="/login"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl glass-card hover:bg-slate-800 text-slate-200 font-semibold text-sm transition-all border border-slate-700/60"
               >
-                Technician Account
+                Technician Portal
               </Link>
             </div>
           </div>
 
-          {/* Pinterest Bento Feature Cards */}
+          {/* Bento Feature Grid */}
           <div className="lg:col-span-5 grid grid-cols-2 gap-3">
             <Link href="/products?category_id=1" className="group glass-card p-4 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-all">
               <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-2 group-hover:scale-110 transition-transform">
@@ -112,7 +112,7 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2 group-hover:scale-110 transition-transform">
                 <Zap className="w-5 h-5" />
               </div>
-              <h3 className="text-xs font-bold text-white group-hover:text-emerald-400">Pure Cobalt Batteries</h3>
+              <h3 className="text-xs font-bold text-white group-hover:text-emerald-400">Cobalt Batteries</h3>
               <p className="text-[10px] text-slate-400 mt-0.5">Zero-Cycle TI IC</p>
             </Link>
 
@@ -121,7 +121,7 @@ export default function HomePage() {
                 <Cpu className="w-5 h-5" />
               </div>
               <h3 className="text-xs font-bold text-white group-hover:text-purple-400">Motherboard ICs</h3>
-              <p className="text-[10px] text-slate-400 mt-0.5">PMIC & BGA Reball</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">PMIC & BGA Chips</p>
             </Link>
 
             <Link href="/products?category_id=7" className="group glass-card p-4 rounded-2xl border border-slate-800 hover:border-cyan-500/50 transition-all">
@@ -168,13 +168,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured High Margin Parts */}
+      {/* High Margin Spares Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg sm:text-xl font-black text-white flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-emerald-400" />
-              High Profit Margin Parts for Technicians
+              High Margin Parts for Technicians
             </h2>
             <p className="text-xs text-slate-400">Tested components with high repair shop margins</p>
           </div>
