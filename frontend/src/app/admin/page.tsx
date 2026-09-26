@@ -13,8 +13,12 @@ import {
   AlertTriangle,
   Plus,
   Trash2,
+  UserPlus,
   CheckCircle2,
-  X
+  X,
+  Building,
+  Mail,
+  Lock
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -29,8 +33,11 @@ export default function AdminDashboardPage() {
   const [usersList, setUsersList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // New product form state
+  // Modals state
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showCreateAdminModal, setShowCreateAdminModal] = useState(false);
+
+  // Product Form
   const [productForm, setProductForm] = useState({
     name: '',
     sku: '',
@@ -45,6 +52,15 @@ export default function AdminDashboardPage() {
     badge_text: 'Service Pack',
     is_featured: false,
     is_new: true,
+  });
+
+  // Create Admin Form
+  const [adminForm, setAdminForm] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    shop_name: 'SAASHA Warehouse Ops',
+    phone: '',
   });
 
   const loadAdminData = async () => {
@@ -87,7 +103,7 @@ export default function AdminDashboardPage() {
       });
       loadAdminData();
     } catch (err) {
-      alert('Failed to update status');
+      alert('Failed to update order status');
     }
   };
 
@@ -102,6 +118,25 @@ export default function AdminDashboardPage() {
       loadAdminData();
     } catch (err: any) {
       alert(err.message || 'Failed to create product');
+    }
+  };
+
+  const handleCreateAdminUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await fetchApi('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...adminForm,
+          role: 'ADMIN',
+        }),
+      });
+      setShowCreateAdminModal(false);
+      setAdminForm({ full_name: '', email: '', password: '', shop_name: 'SAASHA Warehouse Ops', phone: '' });
+      loadAdminData();
+      alert('New Management Admin user created successfully!');
+    } catch (err: any) {
+      alert(err.message || 'Failed to create management admin user');
     }
   };
 
@@ -122,23 +157,35 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="glass-panel p-6 rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-slate-950 via-slate-900 to-cyan-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className={`glass-panel p-6 rounded-3xl border ${isSuperAdmin ? 'border-purple-500/40 bg-gradient-to-r from-slate-950 via-purple-950/20 to-slate-950' : 'border-cyan-500/30 bg-gradient-to-r from-slate-950 via-cyan-950/30 to-slate-950'} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xl`}>
         <div>
-          <div className="inline-flex items-center gap-1.5 bg-cyan-500/20 text-cyan-300 border-cyan-500/40 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border mb-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" /> Warehouse Management Desk
+          <div className={`inline-flex items-center gap-1.5 ${isSuperAdmin ? 'bg-purple-500/20 text-purple-300 border-purple-500/40' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'} text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border mb-1`}>
+            {isSuperAdmin ? <Crown className="w-3.5 h-3.5 text-purple-400" /> : <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />}
+            {isSuperAdmin ? 'Superadmin Master Desk' : 'Warehouse Management Desk'}
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-white">SAASHA Spares Control Center</h1>
           <p className="text-xs text-slate-300 mt-0.5">
-            Logged in as Admin: <strong className="text-cyan-400">{user?.full_name}</strong> ({user?.email})
+            Logged in as: <strong className={isSuperAdmin ? 'text-purple-400' : 'text-cyan-400'}>{user?.full_name}</strong> ({user?.role})
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddProductModal(true)}
-          className="px-4 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs transition-all shadow-lg shadow-cyan-400/20 flex items-center gap-1.5"
-        >
-          <Plus className="w-4 h-4" /> Add Wholesale Item
-        </button>
+        <div className="flex items-center gap-2">
+          {isSuperAdmin && (
+            <button
+              onClick={() => setShowCreateAdminModal(true)}
+              className="px-4 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 font-black text-xs transition-all shadow-lg shadow-purple-500/20 flex items-center gap-1.5"
+            >
+              <UserPlus className="w-4 h-4" /> Add Admin User
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowAddProductModal(true)}
+            className="px-4 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs transition-all shadow-lg shadow-cyan-400/20 flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" /> Add Wholesale Item
+          </button>
+        </div>
       </div>
 
       {/* Overview Stats Cards Grid */}
@@ -163,9 +210,11 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="glass-card p-4 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Onboarded Shopkeepers</span>
-            <div className="text-lg sm:text-2xl font-black text-purple-400 mt-1">{stats.total_shopkeepers} Labs</div>
-            <span className="text-[10px] text-slate-400">{stats.total_admins} Warehouse Admins</span>
+            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">System Accounts</span>
+            <div className="text-lg sm:text-2xl font-black text-purple-400 mt-1">
+              {stats.total_admins} Admins • {stats.total_shopkeepers} Labs
+            </div>
+            <span className="text-[10px] text-slate-400">Active accounts</span>
           </div>
         </div>
       )}
@@ -175,7 +224,7 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('orders')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'orders' ? 'bg-cyan-400 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
+            activeTab === 'orders' ? 'bg-cyan-400 text-slate-950 font-black' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
           Spares Orders Queue ({orders.length})
@@ -183,7 +232,7 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('products')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'products' ? 'bg-cyan-400 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
+            activeTab === 'products' ? 'bg-cyan-400 text-slate-950 font-black' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
           Inventory & Stock ({products.length})
@@ -191,10 +240,10 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setActiveTab('users')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'users' ? 'bg-cyan-400 text-slate-950' : 'glass-card text-slate-300 hover:bg-slate-800'
+            activeTab === 'users' ? 'bg-cyan-400 text-slate-950 font-black' : 'glass-card text-slate-300 hover:bg-slate-800'
           }`}
         >
-          Technicians & Lab Accounts ({usersList.length})
+          Registered Accounts ({usersList.length})
         </button>
       </div>
 
@@ -223,7 +272,6 @@ export default function AdminDashboardPage() {
                         <span className="text-[10px] text-slate-400 block">{order.total_items} total items</span>
                       </div>
 
-                      {/* Status Change Selector */}
                       <select
                         value={order.status}
                         onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
@@ -300,17 +348,34 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 3: REGISTERED USERS */}
+      {/* TAB 3: REGISTERED ACCOUNTS */}
       {activeTab === 'users' && (
         <div className="space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Registered Repair Labs & Technicians</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider">Registered Accounts</h2>
+            {isSuperAdmin && (
+              <button
+                onClick={() => setShowCreateAdminModal(true)}
+                className="px-3 py-1.5 bg-purple-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1"
+              >
+                <UserPlus className="w-3.5 h-3.5" /> Create Admin User
+              </button>
+            )}
+          </div>
+
           <div className="space-y-2">
             {usersList.map((usr) => (
               <div key={usr.id} className="glass-card p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-white">{usr.full_name}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      usr.role === 'SUPERADMIN'
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                        : usr.role === 'ADMIN'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                    }`}>
                       {usr.role}
                     </span>
                   </div>
@@ -318,6 +383,78 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* CREATE ADMIN USER MODAL (For Superadmin) */}
+      {showCreateAdminModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel max-w-md w-full p-6 rounded-3xl border border-purple-500/40 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-purple-400" /> Create Management Admin User
+              </h3>
+              <button onClick={() => setShowCreateAdminModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateAdminUser} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Admin Full Name *</label>
+                <input
+                  required
+                  type="text"
+                  value={adminForm.full_name}
+                  onChange={(e) => setAdminForm({ ...adminForm, full_name: e.target.value })}
+                  placeholder="e.g. Vikram Malhotra"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Admin Email Address *</label>
+                <input
+                  required
+                  type="email"
+                  value={adminForm.email}
+                  onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                  placeholder="admin.name@saasha.com"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Password *</label>
+                <input
+                  required
+                  type="password"
+                  value={adminForm.password}
+                  onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                  placeholder="••••••••"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Department / Warehouse Section</label>
+                <input
+                  type="text"
+                  value={adminForm.shop_name}
+                  onChange={(e) => setAdminForm({ ...adminForm, shop_name: e.target.value })}
+                  placeholder="SAASHA Warehouse Ops"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-purple-500 hover:bg-purple-400 text-slate-950 font-black rounded-xl text-xs mt-2 shadow-lg shadow-purple-500/20"
+              >
+                Create Admin Account
+              </button>
+            </form>
           </div>
         </div>
       )}
