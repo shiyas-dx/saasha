@@ -85,7 +85,7 @@ def create_category(category_in: CategoryCreate, db: Session = Depends(get_db)):
     db.refresh(category)
     return category
 
-# Order Management
+# Order Management & Dispatch Tracking
 @router.get("/orders", response_model=List[OrderOut])
 def get_all_orders(
     status: Optional[str] = Query(None),
@@ -107,34 +107,19 @@ def update_order_status(order_id: int, status_in: OrderStatusUpdate, db: Session
         raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of {valid_statuses}")
 
     order.status = status_in.status.upper()
+    
+    if status_in.tracking_number:
+        order.tracking_number = status_in.tracking_number
+    if status_in.courier_name:
+        order.courier_name = status_in.courier_name
+    if status_in.estimated_delivery:
+        order.estimated_delivery = status_in.estimated_delivery
+
     db.commit()
     db.refresh(order)
     return order
 
-# Users / Role Management (SUPERADMIN, ADMIN, SHOPKEEPER)
+# Users Management
 @router.get("/users", response_model=List[UserOut])
 def get_all_users(db: Session = Depends(get_db)):
     return db.query(User).order_by(User.id.desc()).all()
-
-@router.patch("/users/{user_id}/role")
-def change_user_role(
-    user_id: int, 
-    role: str, 
-    current_user: User = Depends(require_admin),
-    db: Session = Depends(get_db)
-):
-    role_upper = role.upper()
-    if role_upper not in ["SUPERADMIN", "ADMIN", "SHOPKEEPER"]:
-        raise HTTPException(status_code=400, detail="Role must be 'SUPERADMIN', 'ADMIN' or 'SHOPKEEPER'")
-
-    # Only SUPERADMIN can promote someone to SUPERADMIN or demote a SUPERADMIN
-    if (role_upper == "SUPERADMIN" or current_user.role != "SUPERADMIN") and current_user.role != "SUPERADMIN":
-        raise HTTPException(status_code=403, detail="Only the Superadmin can assign or change Superadmin privileges.")
-
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    user.role = role_upper
-    db.commit()
-    return {"message": f"User role updated to {role_upper}", "user_id": user_id, "role": role_upper}

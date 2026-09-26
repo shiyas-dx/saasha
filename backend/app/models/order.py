@@ -15,6 +15,12 @@ class Order(Base):
     shipping_address = Column(Text, nullable=False)
     contact_phone = Column(String, nullable=False)
     notes = Column(Text, nullable=True)
+    
+    # Advanced Dispatch & Tracking Fields
+    tracking_number = Column(String, nullable=True) # e.g. TRK-88992211
+    courier_name = Column(String, nullable=True)    # e.g. BlueDart B2B / Delhivery Express
+    estimated_delivery = Column(String, nullable=True) # e.g. 28 Sep 2026
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

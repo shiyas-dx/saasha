@@ -26,6 +26,9 @@ class OrderCreate(BaseModel):
 
 class OrderStatusUpdate(BaseModel):
     status: str # PENDING, APPROVED, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    tracking_number: Optional[str] = None
+    courier_name: Optional[str] = None
+    estimated_delivery: Optional[str] = None
 
 class OrderOut(BaseModel):
     id: int
@@ -37,6 +40,9 @@ class OrderOut(BaseModel):
     shipping_address: str
     contact_phone: str
     notes: Optional[str] = None
+    tracking_number: Optional[str] = None
+    courier_name: Optional[str] = None
+    estimated_delivery: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     items: List[OrderItemOut] = []
